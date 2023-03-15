@@ -4,9 +4,11 @@ namespace Domain.RepositoriesInterfaces;
 
 public interface IAssetsRepository
 {
-    int CreateAsset(string assetName);
+    Asset CreateAsset(string assetName);
 
     Task<Asset> GetAsset(string assetName);
+
+    void CreateAssetData(IEnumerable<AssetData> assetData);
 
     IEnumerable<AssetData> GetAssetDataForLastThirtyDays(int assetId);
 }

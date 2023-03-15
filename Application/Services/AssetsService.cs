@@ -1,6 +1,9 @@
 ﻿using Application.ServicesInterfaces;
 using Domain.DTOs;
+using Domain.Models;
+using Domain.RepositoriesInterfaces;
 using Microsoft.Extensions.Configuration;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace Application.Services;
@@ -9,20 +12,29 @@ public class AssetsService : IAssetsService
 {
     private static HttpClient client = new HttpClient();
     private readonly IConfiguration _configuration;
+    private readonly IAssetsRepository _assetsRepository;
 
-    public AssetsService(IConfiguration configuration)
+    public AssetsService(IConfiguration configuration, IAssetsRepository assetsRepository)
     {
-        this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _assetsRepository = assetsRepository ?? throw new ArgumentNullException(nameof(assetsRepository));
     }
 
     public OperationResultDTO SaveAssetDataFromSource(string assetName)
     {
+        var asset = _assetsRepository.GetAsset(assetName).Result;
+        if(asset != null)
+            return new OperationResultDTO() { Message = $"Asset {assetName} já consultado.", StatusCode = HttpStatusCode.BadRequest };
+
+        asset = _assetsRepository.CreateAsset(assetName);
+
         var assetData = GetDataFromSource(assetName);
 
         if (assetData.Chart.Error != null)
             return new OperationResultDTO() { Message = assetData.Chart.Error.Description, StatusCode = assetData.StatusCode };
 
-        InsertAssetDataIntoDatabase(assetName, assetData);
+        var calculatedAssetsData = GetAssetsDataCalculated(asset, assetData);
+        _assetsRepository.CreateAssetData(calculatedAssetsData);
 
         return new OperationResultDTO() { StatusCode = assetData.StatusCode };
     }
@@ -46,14 +58,57 @@ public class AssetsService : IAssetsService
         return assetData;
     }
 
-    private void InsertAssetDataIntoDatabase(string assetName, AssetDataDTO assetData)
+    private List<AssetData> GetAssetsDataCalculated(Asset asset, AssetDataDTO assetData)
     {
+        var results = assetData.Chart.Result.First();
+        var timestamps = results.Timestamp;
+        var openValues = results.Indicators.Quote.First().Open;
 
+        var newAssets = new List<AssetData>();
+        var firstValue = openValues[0];
+
+        for (var valueIndex = 0; valueIndex < timestamps.Length; valueIndex++) 
+        {
+            long? timestamp = timestamps[valueIndex];
+            var openValue = openValues[valueIndex] ?? 0;
+
+            decimal? variationForOneDay = null;
+            decimal? variationSinceFirstDay = null;
+
+            if (valueIndex != 0)
+            {
+                var previousValue = openValues[valueIndex - 1];
+                var minorValue = previousValue < openValue ? previousValue : openValue;
+                var majorValue = previousValue > openValue ? previousValue : openValue;
+
+                variationForOneDay = minorValue != 0
+                    ? ((majorValue - minorValue) / minorValue) * 100
+                    : majorValue;
+
+                minorValue = firstValue < openValue ? firstValue : openValue;
+                majorValue = firstValue > openValue ? firstValue : openValue;
+
+                variationSinceFirstDay = minorValue != 0
+                    ? ((majorValue - minorValue) / minorValue) * 100
+                    : majorValue;
+            }
+
+            newAssets.Add(new AssetData() { AssetId = asset.Id, AssetValue = openValue, TradingFloorDate = timestamp != null ? new DateTime(timestamp.Value) : null, VariationForOneDay = variationForOneDay, VariationSinceFirstDay = variationSinceFirstDay });
+        }
+
+        return newAssets;
     }
 
     public OperationResultDTO GetAssetDataFromDatabase(string assetName)
     {
-        throw new NotImplementedException();
+        var asset = _assetsRepository.GetAsset(assetName).Result;
+
+        if(asset == null)
+            return new OperationResultDTO() { StatusCode = HttpStatusCode.NotFound, Message = "Asset não encontrado." };
+
+        var assetsData = _assetsRepository.GetAssetDataForLastThirtyDays(asset.Id);
+
+        return new OperationResultDTO<IEnumerable<AssetData>>() { Data = assetsData, StatusCode = HttpStatusCode.OK };
     }
 
 }
