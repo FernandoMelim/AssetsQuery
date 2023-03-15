@@ -1,20 +1,23 @@
 using Application.Services;
 using Application.ServicesInterfaces;
+using Domain.RepositoriesInterfaces;
+using Infrastructure.Dapper.Contexts;
+using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IAssetsService, AssetsService>();
+builder.Services.AddSingleton<IAssetsRepository, AssetsRepository>();
+builder.Services.AddSingleton<DapperContext>();
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
