@@ -80,7 +80,7 @@ public class AssetsRepository : IAssetsRepository
 
     public IEnumerable<AssetData> GetAssetDataForLastThirtyDays(int assetId)
     {
-        var query = "SELECT TOP 30 * FROM AssetData WHERE AssetId = @assetId ORDER BY TradingFloorDate DESC;";
+        var query = "SELECT * FROM AssetData WHERE AssetId = @assetId ORDER BY TradingFloorDate DESC;";
 
         var parameters = new DynamicParameters();
         parameters.Add("assetId", assetId);

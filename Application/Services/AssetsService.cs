@@ -47,7 +47,8 @@ public class AssetsService : IAssetsService
         var requestUrl = yahooSettings.GetSection("YahooFinanceApiBaseUrl").Value
                         + yahooSettings.GetSection("YahooFinanceApiVersion").Value
                         + yahooSettings.GetSection("YahooFinanceApiAssetBasePath").Value
-                        + assetName;
+                        + assetName
+                        + yahooSettings.GetSection("MonthFilter").Value;
 
         HttpResponseMessage response = client.GetAsync(requestUrl).Result;
 
@@ -93,10 +94,12 @@ public class AssetsService : IAssetsService
                     : majorValue;
             }
 
+            var tradingFloorDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
             newAssets.Add(new AssetData() { 
                 AssetId = asset.Id, 
                 AssetValue = openValue, 
-                TradingFloorDate = timestamp != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timestamp.Value) : null, 
+                TradingFloorDate = timestamp != null ? tradingFloorDate.AddSeconds(timestamp.Value) : null, 
                 VariationForOneDay = variationForOneDay, 
                 VariationSinceFirstDay = variationSinceFirstDay });
         }
@@ -109,7 +112,7 @@ public class AssetsService : IAssetsService
         var asset = _assetsRepository.GetAsset(assetName).Result;
 
         if(asset == null)
-            return new OperationResultDTO() { StatusCode = HttpStatusCode.NotFound, Message = "Asset não encontrado." };
+            return new OperationResultDTO() { StatusCode = HttpStatusCode.NotFound, Message = "Asset ainda não foi consultado." };
 
         var assetsData = _assetsRepository.GetAssetDataForLastThirtyDays(asset.Id).OrderBy(x => x.TradingFloorDate);
 
