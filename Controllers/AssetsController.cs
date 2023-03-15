@@ -9,7 +9,7 @@ public class AssetsController : ControllerBase
 {
     private IAssetsService _assetsService;
 
-    public AssetsController(IAssetsService assetsService) 
+    public AssetsController(IAssetsService assetsService)
     {
         _assetsService = assetsService ?? throw new ArgumentNullException(nameof(assetsService));
     }
@@ -17,19 +17,19 @@ public class AssetsController : ControllerBase
     [HttpGet]
     public ActionResult Get(string assetName)
     {
+        var operationResultDTO = _assetsService.GetAssetDataFromDatabase(assetName);
+        return Ok(operationResultDTO);
+    }
+
+    [HttpPost]
+    public ActionResult Post(string assetName)
+    {
         var operationResultDTO = _assetsService.SaveAssetDataFromSource(assetName);
 
         var result = new JsonResult(operationResultDTO);
         result.StatusCode = (int)operationResultDTO.StatusCode;
 
         return result;
-    }
-
-    [HttpPost]
-    public ActionResult Post(string assetName)
-    {
-        var operationResultDTO = _assetsService.GetAssetDataFromDatabase(assetName);
-        return Ok(operationResultDTO);
     }
 }
 
