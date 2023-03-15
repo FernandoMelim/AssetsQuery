@@ -1,0 +1,20 @@
+CREATE TABLE Asset (
+	Id int NOT NULL,
+	AssetName varchar(20) NOT NULL,
+	Primary Key (Id)
+)
+
+CREATE TABLE AssetData(
+	Id int NOT NULL,
+	Id_Asset int,
+	TradingFloorDate Date,
+	AssetValue decimal(30, 25),
+	VariationForOneDay decimal(4,2),
+	VariationSinceFirstDay decimal(4,2),
+	Primary Key (Id),
+	FOREIGN KEY (Id_Asset) REFERENCES Asset(Id)
+)
+
+CREATE INDEX idx_asset_name ON Asset (AssetName)
+
+CREATE INDEX idx_asset_id ON AssetData (Id_Asset)
