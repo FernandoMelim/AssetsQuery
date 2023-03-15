@@ -27,9 +27,9 @@ public class AssetsServiceTests
             .Setup<IAssetsRepository, Task<Asset>>(x => x.GetAsset(It.IsAny<string>()))
             .ReturnsAsync(() => new Asset() { Id = 1, AssetName = assetNameTest });
 
-        var assetsControllerInstance = _autoMocker.CreateInstance<AssetsService>();
+        var instance = _autoMocker.CreateInstance<AssetsService>();
 
-        var response = assetsControllerInstance.SaveAssetDataFromSource(assetNameTest);
+        var response = instance.SaveAssetDataFromSource(assetNameTest);
 
         Assert.NotNull(response);
         Assert.Equal($"Asset {assetNameTest} já consultado.", response.Message);
@@ -85,9 +85,9 @@ public class AssetsServiceTests
                 }
             });
 
-        var assetsControllerInstance = _autoMocker.CreateInstance<AssetsService>();
+        var instance = _autoMocker.CreateInstance<AssetsService>();
 
-        var response = assetsControllerInstance.SaveAssetDataFromSource(assetNameTest);
+        var response = instance.SaveAssetDataFromSource(assetNameTest);
 
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -130,9 +130,9 @@ public class AssetsServiceTests
                 }
             });
 
-        var assetsControllerInstance = _autoMocker.CreateInstance<AssetsService>();
+        var instance = _autoMocker.CreateInstance<AssetsService>();
 
-        var response = assetsControllerInstance.SaveAssetDataFromSource(assetNameTest);
+        var response = instance.SaveAssetDataFromSource(assetNameTest);
 
         Assert.NotNull(response);
         Assert.Equal("Resource not found", response.Message);
@@ -148,9 +148,9 @@ public class AssetsServiceTests
             .Setup<IAssetsRepository, Task<Asset>>(x => x.GetAsset(It.IsAny<string>()))
             .ReturnsAsync(() => null);
 
-        var assetsControllerInstance = _autoMocker.CreateInstance<AssetsService>();
+        var instance = _autoMocker.CreateInstance<AssetsService>();
 
-        var response = assetsControllerInstance.GetAssetDataFromDatabase(assetNameTest);
+        var response = instance.GetAssetDataFromDatabase(assetNameTest);
 
         Assert.NotNull(response);
         Assert.Equal("Asset ainda não foi consultado.", response.Message);
@@ -174,9 +174,9 @@ public class AssetsServiceTests
                 assetDataReturned
             });
 
-        var assetsControllerInstance = _autoMocker.CreateInstance<AssetsService>();
+        var instance = _autoMocker.CreateInstance<AssetsService>();
 
-        var response = (assetsControllerInstance.GetAssetDataFromDatabase(assetNameTest));
+        var response = (instance.GetAssetDataFromDatabase(assetNameTest));
         var data = ((OperationResultDTO<IEnumerable<Domain.Models.AssetData>>)response).Data.First();
 
         Assert.NotNull(response);

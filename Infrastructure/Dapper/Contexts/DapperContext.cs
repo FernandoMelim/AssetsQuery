@@ -15,6 +15,9 @@ public class DapperContext
         _connectionString = _configuration.GetConnectionString("SqlConnection") ?? throw new ArgumentNullException("Empty connection string");
     }
 
-    public IDbConnection CreateConnection()
+    public DapperContext()
+    { }
+
+    public virtual IDbConnection CreateConnection()
         => new SqlConnection(_connectionString);
 }
