@@ -1,8 +1,12 @@
-﻿namespace Domain.DTOs;
+﻿using System.Net;
+
+namespace Domain.DTOs;
 
 public class AssetDataDTO
 {
     public ChartData Chart { get; set; }
+
+    public HttpStatusCode StatusCode { get; set; }
 
     public class ChartData
     {

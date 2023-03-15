@@ -8,5 +8,4 @@ public class ErrorDTO
 
     public string Description { get; set; }
 
-    public HttpStatusCode StatusCode { get; set; }
 }
