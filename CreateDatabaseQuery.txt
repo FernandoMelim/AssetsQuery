@@ -5,8 +5,8 @@ CREATE TABLE Asset (
 );
 
 CREATE TABLE AssetData(
-	Id int NOT NULL,
-	AssetId int,
+	Id int NOT NULL IDENTITY,
+	AssetId int NOT NULL,
 	TradingFloorDate Date,
 	AssetValue decimal(30, 25),
 	VariationForOneDay decimal(4,2),
@@ -18,4 +18,3 @@ CREATE TABLE AssetData(
 CREATE INDEX idx_asset_name ON Asset (AssetName);
 
 CREATE INDEX idx_asset_id ON AssetData (AssetId);
-

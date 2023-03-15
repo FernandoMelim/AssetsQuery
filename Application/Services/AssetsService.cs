@@ -93,7 +93,12 @@ public class AssetsService : IAssetsService
                     : majorValue;
             }
 
-            newAssets.Add(new AssetData() { AssetId = asset.Id, AssetValue = openValue, TradingFloorDate = timestamp != null ? new DateTime(timestamp.Value) : null, VariationForOneDay = variationForOneDay, VariationSinceFirstDay = variationSinceFirstDay });
+            newAssets.Add(new AssetData() { 
+                AssetId = asset.Id, 
+                AssetValue = openValue, 
+                TradingFloorDate = timestamp != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timestamp.Value) : null, 
+                VariationForOneDay = variationForOneDay, 
+                VariationSinceFirstDay = variationSinceFirstDay });
         }
 
         return newAssets;
@@ -106,7 +111,7 @@ public class AssetsService : IAssetsService
         if(asset == null)
             return new OperationResultDTO() { StatusCode = HttpStatusCode.NotFound, Message = "Asset não encontrado." };
 
-        var assetsData = _assetsRepository.GetAssetDataForLastThirtyDays(asset.Id);
+        var assetsData = _assetsRepository.GetAssetDataForLastThirtyDays(asset.Id).OrderBy(x => x.TradingFloorDate);
 
         return new OperationResultDTO<IEnumerable<AssetData>>() { Data = assetsData, StatusCode = HttpStatusCode.OK };
     }
