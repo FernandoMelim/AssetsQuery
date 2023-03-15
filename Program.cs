@@ -1,3 +1,4 @@
+using Application.ApiCalls;
 using Application.Services;
 using Application.ServicesInterfaces;
 using Domain.RepositoriesInterfaces;
@@ -12,6 +13,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IAssetsService, AssetsService>();
 builder.Services.AddSingleton<IAssetsRepository, AssetsRepository>();
+builder.Services.AddSingleton<IYahooApiCalls, YahooApiCalls>();
 builder.Services.AddSingleton<DapperContext>();
 
 builder.Services.AddControllers();

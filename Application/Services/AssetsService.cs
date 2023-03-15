@@ -1,4 +1,5 @@
-﻿using Application.ServicesInterfaces;
+﻿using Application.ApiCalls;
+using Application.ServicesInterfaces;
 using Domain.DTOs;
 using Domain.Models;
 using Domain.RepositoriesInterfaces;
@@ -10,14 +11,14 @@ namespace Application.Services;
 
 public class AssetsService : IAssetsService
 {
-    private static HttpClient client = new HttpClient();
-    private readonly IConfiguration _configuration;
+    
     private readonly IAssetsRepository _assetsRepository;
+    private readonly IYahooApiCalls _yahooApiCalls;
 
-    public AssetsService(IConfiguration configuration, IAssetsRepository assetsRepository)
+    public AssetsService(IAssetsRepository assetsRepository, IYahooApiCalls yahooApiCalls)
     {
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _assetsRepository = assetsRepository ?? throw new ArgumentNullException(nameof(assetsRepository));
+        _yahooApiCalls = yahooApiCalls ?? throw new ArgumentNullException(nameof(yahooApiCalls));
     }
 
     public OperationResultDTO SaveAssetDataFromSource(string assetName)
@@ -28,7 +29,7 @@ public class AssetsService : IAssetsService
 
         asset = _assetsRepository.CreateAsset(assetName);
 
-        var assetData = GetDataFromSource(assetName);
+        var assetData = _yahooApiCalls.GetDataFromSource(assetName);
 
         if (assetData.Chart.Error != null)
             return new OperationResultDTO() { Message = assetData.Chart.Error.Description, StatusCode = assetData.StatusCode };
@@ -37,26 +38,6 @@ public class AssetsService : IAssetsService
         _assetsRepository.CreateAssetData(calculatedAssetsData);
 
         return new OperationResultDTO() { StatusCode = assetData.StatusCode };
-    }
-
-    private AssetDataDTO GetDataFromSource(string assetName)
-    {
-
-        var yahooSettings = _configuration.GetSection("YahooSettings");
-
-        var requestUrl = yahooSettings.GetSection("YahooFinanceApiBaseUrl").Value
-                        + yahooSettings.GetSection("YahooFinanceApiVersion").Value
-                        + yahooSettings.GetSection("YahooFinanceApiAssetBasePath").Value
-                        + assetName
-                        + yahooSettings.GetSection("MonthFilter").Value;
-
-        HttpResponseMessage response = client.GetAsync(requestUrl).Result;
-
-        var assetData = response.Content.ReadFromJsonAsync<AssetDataDTO>().Result;
-
-        assetData.StatusCode = response.StatusCode;
-
-        return assetData;
     }
 
     private List<AssetData> GetAssetsDataCalculated(Asset asset, AssetDataDTO assetData)
