@@ -22,4 +22,6 @@ Domain: Responsável por conter as entidades e enums do projeto.<br/>
 Infrastructure: responsável por conter os repositórios e a implementação de acesso ao banco de acordo com o sgbd e ORM usado. Por ser um projeto pequeno, optei por utilizar o Dapper, mas eu usaria o EntityFramework para projetos maiores pela facilidade de utilização.<br/><br/>
 
 
-Foram feitos testes unitários utilizando o xUnit no projeto chamado Tests.
+Foram feitos testes unitários utilizando o xUnit no projeto chamado Tests. <br/><br/>
+
+Link para a descrição do teste técnico: https://github.com/guideti/variacao-ativo
