@@ -14,9 +14,12 @@ Ambos endpoints recebem como parâmetro o nome do ativo solicitado, como por exem
 
 
 ## Arquitetura
-O projeto possui 4 camadas, que são: Presentation, Application, Domain e Infrastructure.
+O projeto possui 4 camadas, que são: Presentation, Application, Domain e Infrastructure. <br/>
 
-Presentation: Responsável por armazenar apenas as configurações, tais como as possíveis variáveis de ambiente, e os controllers da aplicação.
-Application: Responsável por conter os Services, que são responsáveis pelas regras de negócio da aplicação e que podem solicitar aos repositórios algum operação no banco de dados.
-Domain: Responsável por conter as entidades e enums do projeto.
-Infrastructure: responsável por conter os repositórios e a implementação de acesso ao banco de acordo com o sgbd e ORM usado. Por ser um projeto pequeno, optei por utilizar o Dapper, mas eu usaria o EntityFramework para projetos maiores pela facilidade de utilização.
+Presentation: Responsável por armazenar apenas as configurações, tais como as possíveis variáveis de ambiente, e os controllers da aplicação.<br/>
+Application: Responsável por conter os Services, que são responsáveis pelas regras de negócio da aplicação e que podem solicitar aos repositórios algum operação no banco de dados.<br/>
+Domain: Responsável por conter as entidades e enums do projeto.<br/>
+Infrastructure: responsável por conter os repositórios e a implementação de acesso ao banco de acordo com o sgbd e ORM usado. Por ser um projeto pequeno, optei por utilizar o Dapper, mas eu usaria o EntityFramework para projetos maiores pela facilidade de utilização.<br/><br/>
+
+
+Foram feitos testes unitários utilizando o xUnit no projeto chamado Tests.

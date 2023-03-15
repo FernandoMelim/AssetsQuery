@@ -18,7 +18,11 @@ public class AssetsController : ControllerBase
     public ActionResult Get(string assetName)
     {
         var operationResultDTO = _assetsService.GetAssetDataFromDatabase(assetName);
-        return Ok(operationResultDTO);
+
+        var result = new JsonResult(operationResultDTO);
+        result.StatusCode = (int)operationResultDTO.StatusCode;
+
+        return Ok(result);
     }
 
     [HttpPost]
